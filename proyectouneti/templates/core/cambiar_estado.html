@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Cambiar Estado de Modelo | Crossover Ledger IA{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    
+    <!-- Tarjeta Principal de Información -->
+    <div class="bg-white border border-pergamino-300 rounded-xl p-6 shadow-sm">
+        <div class="border-b border-pergamino-200 pb-4 mb-4">
+            <span class="text-xs uppercase font-bold tracking-wider text-marino/60">Gestión de Ciclo de Vida (RF-05)</span>
+            <h1 class="text-xl font-bold text-marino mt-1">Cambiar Estado del Modelo</h1>
+            <p class="text-sm text-marino/70 mt-1">
+                Modelo: <span class="font-semibold text-marino">{{ version_modelo.modelo.nombre }}</span> (Versión: <span class="font-semibold">{{ version_modelo.version }}</span>)
+            </p>
+        </div>
+
+        <div class="bg-pergamino-100 p-4 rounded-lg mb-6 flex items-center justify-between">
+            <div>
+                <p class="text-xs font-medium text-marino/60 uppercase">Estado Actual</p>
+                <p class="text-sm font-bold text-marino mt-0.5">{{ version_modelo.get_estado_display }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-marino/60 uppercase">Nivel de Riesgo</p>
+                <p class="text-sm font-bold text-marino mt-0.5 uppercase">{{ version_modelo.nivel_riesgo }}</p>
+            </div>
+        </div>
+
+        <!-- Formulario con HTMX y Alpine.js -->
+        <form method="post" class="space-y-4" x-data="{ cargando: false }" @submit="cargando = true">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-xs font-semibold text-marino/80 uppercase tracking-wider mb-1">Nuevo Estado</label>
+                {{ form.estado_nuevo }}
+                {% if form.estado_nuevo.errors %}
+                    <p class="text-xs text-red-600 mt-1">{{ form.estado_nuevo.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-marino/80 uppercase tracking-wider mb-1">Justificación del Cambio</label>
+                {{ form.justificacion }}
+                <p class="text-[11px] text-marino/60 mt-1">Describa el motivo técnico o administrativo del cambio de fase (requisito para la trazabilidad del ledger).</p>
+                {% if form.justificacion.errors %}
+                    <p class="text-xs text-red-600 mt-1">{{ form.justificacion.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-4 border-t border-pergamino-200">
+                <a href="{% url 'dashboard' %}" class="bg-pergamino-200 hover:bg-pergamino-300 text-marino text-xs font-semibold px-4 py-2 rounded-lg transition">
+                    Cancelar
+                </a>
+                
+                <button type="submit" 
+                        class="bg-marino hover:bg-marino-light text-pergamino-100 text-xs font-semibold px-5 py-2 rounded-lg transition flex items-center space-x-2"
+                        :class="{ 'opacity-75 cursor-not-allowed': cargando }">
+                    <span x-show="!cargando">Confirmar Transición</span>
+                    <span x-show="cargando" class="flex items-center space-x-2">
+                        <svg class="animate-spin h-4 w-4 text-pergamino-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Registrando en Ledger...</span>
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

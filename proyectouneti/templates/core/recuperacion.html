@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#E9E5DA]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar credenciales | Crossover Ledger IA</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pergamino: { 100: '#E9E5DA', 200: '#E3DDD1', 300: '#DCD4C4', 400: '#D8CDBD' },
+                        marino: { DEFAULT: '#0E1F39', dark: '#07101C', light: '#1B365D' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-full flex items-center justify-center bg-pergamino-100 text-marino antialiased px-4 py-10 relative overflow-x-hidden">
+
+    <!-- Patrón de fondo tecnológico sutil -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+         style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+    <div class="relative bg-white border border-pergamino-300 p-8 rounded-xl shadow-lg w-full max-w-md">
+
+        <!-- ── Encabezado tipo Terminal / Nodo ── -->
+        <div class="text-center flex flex-col items-center mb-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-marino text-pergamino-100 mb-3 shadow-inner">
+                <span class="h-2 w-2 rounded-full bg-pergamino-100 animate-pulse"></span>
+                <span class="font-mono text-xs font-bold tracking-widest uppercase">SECURE // AUTH_RECOVERY</span>
+            </div>
+            <h1 class="text-xl font-bold text-marino tracking-tight">Recuperar Credenciales</h1>
+            <p class="font-mono text-[11px] text-marino/70 mt-1 max-w-xs">
+                Protocolo de reasignación de acceso institucional y despacho de token temporal.
+            </p>
+        </div>
+
+        <!-- ── Bloque de Mensajes Django ── -->
+        {% if messages %}
+            <div class="space-y-2 mb-4">
+                {% for m in messages %}
+                <div class="p-3 bg-pergamino-200 border-l-4 border-marino text-marino font-mono text-xs rounded shadow-sm">
+                    <span class="font-bold">[SYS]:</span> {{ m }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- ── Formulario de Recuperación ── -->
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="id_username"
+                       class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                    <span>Nombre de usuario</span>
+                    <span class="text-[10px] text-marino/40">IDENTITY</span>
+                </label>
+                <input type="text" name="username" id="id_username" required
+                       placeholder="usuario.institucional"
+                       autofocus autocomplete="username"
+                       class="block w-full rounded-lg border border-pergamino-300 bg-white
+                              px-3.5 py-2.5 font-mono text-xs text-marino placeholder:text-marino/40 shadow-sm
+                              transition-colors duration-150
+                              focus:border-marino focus:outline focus:outline-2 focus:outline-marino">
+            </div>
+
+            <div>
+                <span class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-2">
+                    <span>Canal de despacho</span>
+                    <span class="text-[10px] text-marino/40">METHOD</span>
+                </span>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-3 p-3 border border-pergamino-300 rounded-lg cursor-pointer hover:border-marino bg-pergamino-100/30 transition">
+                        <input type="radio" name="metodo" value="email" checked
+                               class="accent-marino h-4 w-4">
+                        <div>
+                            <span class="block text-xs font-bold text-marino">Correo electrónico institucional</span>
+                            <span class="block font-mono text-[10px] text-marino/60">Despacho de enlace cifrado vía mail</span>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border border-pergamino-300 rounded-lg cursor-pointer hover:border-marino bg-pergamino-100/30 transition">
+                        <input type="radio" name="metodo" value="telefono"
+                               class="accent-marino h-4 w-4">
+                        <div>
+                            <span class="block text-xs font-bold text-marino">Número de teléfono móvil</span>
+                            <span class="block font-mono text-[10px] text-marino/60">Despacho de código OTP por SMS</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-marino hover:bg-marino-light text-pergamino-100 font-mono text-xs font-semibold uppercase tracking-wider py-3 rounded-lg transition duration-200 shadow-sm flex items-center justify-center gap-2 border border-marino">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+                <span>Enviar instrucciones de acceso</span>
+            </button>
+        </form>
+
+        <div class="relative my-5">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-pergamino-300"></div>
+            </div>
+            <div class="relative flex justify-center font-mono text-[10px] uppercase tracking-wider">
+                <span class="bg-white px-2 text-marino/50">o regresar al nodo</span>
+            </div>
+        </div>
+
+        <a href="{% url 'login' %}"
+           class="block w-full text-center border border-pergamino-300 bg-pergamino-100/50 text-marino hover:bg-marino hover:text-pergamino-100 hover:border-marino font-mono text-xs font-semibold uppercase tracking-wider py-2.5 rounded-lg transition duration-200">
+            ← Volver al login
+        </a>
+
+        <!-- Pie técnico -->
+        <div class="mt-6 text-center font-mono text-[10px] text-marino/50 border-t border-pergamino-200 pt-4 flex flex-col items-center gap-1">
+            <span>Crossover Integrated Solutions</span>
+            <span class="text-[9px] text-marino/40">Trazabilidad Criptográfica SHA-256 Ledger</span>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,275 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Registrar Modelo de IA | Crossover Ledger IA{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-6 px-4 space-y-6">
+
+    <!-- ── Encabezado Técnico del Módulo ── -->
+    <div class="relative overflow-hidden bg-white border border-pergamino-300 border-l-4 border-l-marino rounded-xl p-6 shadow-sm">
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+             style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+        <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-lg bg-marino text-pergamino-100 shadow-inner">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                              d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase tracking-widest bg-pergamino-200 text-marino border border-pergamino-300">
+                            <span class="h-1.5 w-1.5 rounded-full bg-marino animate-pulse"></span>
+                            INGESTA // RF-01
+                        </span>
+                        <span class="text-[10px] font-mono uppercase tracking-wider text-marino/50">
+                            PROTOCOLO SHA-256 LEDGER
+                        </span>
+                    </div>
+                    <h1 class="text-xl font-bold text-marino tracking-tight mt-1.5">
+                        Registrar Modelo de IA y Artefacto
+                    </h1>
+                    <p class="text-xs text-marino/70 mt-0.5 max-w-2xl">
+                        Complete los metadatos técnicos y la huella criptográfica del modelo para indexarlo de forma inmutable en el registro institucional.
+                    </p>
+                </div>
+            </div>
+
+            <a href="{% url 'dashboard' %}"
+               class="self-start sm:self-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pergamino-100 hover:bg-pergamino-200 text-marino border border-pergamino-300 font-mono text-[11px] uppercase tracking-wider transition">
+                <span>← Volver</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ── Panel de Errores de Validación ── -->
+    {% if form_modelo.errors or form_version.errors %}
+    <div class="bg-pink-50 border border-pink-200 border-l-4 border-l-pink-600 rounded-xl p-4 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="px-2 py-0.5 rounded bg-pink-100 text-pink-800 font-mono text-[10px] font-bold uppercase tracking-wider">
+                ERR // VALIDACIÓN FALLIDA
+            </span>
+            <p class="font-bold text-pink-800 text-xs">
+                No se pudo sellar el registro en el ledger. Revise los siguientes parámetros:
+            </p>
+        </div>
+        <div class="space-y-1 pl-1">
+            {% for field, errors in form_modelo.errors.items %}
+                {% for error in errors %}
+                    <p class="font-mono text-xs text-pink-700">
+                        <span class="font-bold">[MODELO.{{ field|upper }}]</span> → {{ error }}
+                    </p>
+                {% endfor %}
+            {% endfor %}
+            {% for field, errors in form_version.errors.items %}
+                {% for error in errors %}
+                    <p class="font-mono text-xs text-pink-700">
+                        <span class="font-bold">[VERSIÓN.{{ field|upper }}]</span> → {{ error }}
+                    </p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Formulario Principal ── -->
+    <form method="post" class="space-y-6" x-data="{ cargando: false }" @submit="cargando = true">
+        {% csrf_token %}
+
+        <!-- Módulo 01: Información Base del Modelo -->
+        <section class="bg-white border border-pergamino-300 rounded-xl shadow-sm overflow-hidden">
+            <header class="px-6 py-3.5 bg-pergamino-100/70 border-b border-pergamino-300 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="h-2 w-2 rounded-sm bg-marino"></span>
+                    <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-marino">
+                        01 // Especificación General del Modelo
+                    </h2>
+                </div>
+                <span class="font-mono text-[10px] uppercase tracking-wider text-marino/50">
+                    METADATOS BASE
+                </span>
+            </header>
+
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                            <span>Nombre del Modelo</span>
+                            <span class="text-[10px] text-marino/40">REQ</span>
+                        </label>
+                        {{ form_modelo.nombre }}
+                    </div>
+                    <div>
+                        <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                            <span>Proveedor / Framework</span>
+                            <span class="text-[10px] text-marino/40">CORE</span>
+                        </label>
+                        {{ form_modelo.proveedor_framework }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                        <span>Propósito o Trámite Automatizado</span>
+                        <span class="text-[10px] text-marino/40">ALCANCE</span>
+                    </label>
+                    {{ form_modelo.proposito }}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
+                    <div>
+                        <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                            <span>Clasificación de Riesgo</span>
+                            <span class="text-[10px] text-marino/40">NIVEL</span>
+                        </label>
+                        {{ form_modelo.nivel_riesgo }}
+                    </div>
+
+                    <div class="flex items-center">
+                        <label class="w-full flex items-center justify-between gap-3 p-3.5 rounded-lg bg-pergamino-100/70 border border-pergamino-300 hover:border-marino/40 cursor-pointer transition">
+                            <div class="flex items-center gap-2.5">
+                                {{ form_modelo.ficha_publica }}
+                                <div>
+                                    <span class="block text-xs font-bold text-marino">Visibilidad Ciudadana</span>
+                                    <span class="block font-mono text-[10px] text-marino/60">Publicar ficha en portal abierto</span>
+                                </div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-white border border-pergamino-200 font-mono text-[10px] text-marino/70">
+                                PUBLIC
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Módulo 02: Datos de Versión y Trazabilidad Criptográfica -->
+        <section class="bg-white border border-pergamino-300 rounded-xl shadow-sm overflow-hidden">
+            <header class="px-6 py-3.5 bg-pergamino-100/70 border-b border-pergamino-300 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="h-2 w-2 rounded-sm bg-marino"></span>
+                    <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-marino">
+                        02 // Trazabilidad Criptográfica y Build Inicial
+                    </h2>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-white border border-pergamino-300 font-mono text-[10px] font-semibold text-marino">
+                    HASH-CHAINING
+                </span>
+            </header>
+
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                            <span>Etiqueta de Versión</span>
+                            <span class="text-[10px] text-marino/40">SEMVER</span>
+                        </label>
+                        {{ form_version.version }}
+                    </div>
+                    <div>
+                        <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                            <span>Algoritmo de Integridad</span>
+                            <span class="text-[10px] text-marino/40">CRYPTO</span>
+                        </label>
+                        {{ form_version.algoritmo_hash }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                            <span>Estado Inicial del Ciclo</span>
+                            <span class="text-[10px] text-marino/40">STATUS</span>
+                        </label>
+                        {{ form_version.estado }}
+                    </div>
+                    <div>
+                        <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                            <span>Riesgo de la Versión</span>
+                            <span class="text-[10px] text-marino/40">AUDITORÍA</span>
+                        </label>
+                        {{ form_version.nivel_riesgo }}
+                    </div>
+                </div>
+
+                <!-- Bloque destacado para el Hash del Artefacto -->
+                <div class="p-4 rounded-lg bg-pergamino-100/60 border border-pergamino-300 space-y-1.5">
+                    <label class="flex items-center justify-between text-[11px] font-mono font-bold text-marino uppercase tracking-wider">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="h-3.5 w-3.5 text-marino" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            Hash del Artefacto (SHA-256)
+                        </span>
+                        <span class="px-1.5 py-0.5 rounded bg-white border border-pergamino-200 text-[10px] text-marino/70">
+                            64 HEX CHARS
+                        </span>
+                    </label>
+                    <div class="font-mono text-xs">
+                        {{ form_version.hash_artefacto }}
+                    </div>
+                    <p class="font-mono text-[10px] text-marino/60">
+                        // Firma digital única generada a partir de los pesos o empaquetado binario del modelo.
+                    </p>
+                </div>
+
+                <div>
+                    <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                        <span>Conjuntos de Datos Vinculados</span>
+                        <span class="text-[10px] text-marino/40">OPCIONAL</span>
+                    </label>
+                    {{ form_version.conjuntos_datos }}
+                </div>
+
+                <div>
+                    <label class="flex items-center justify-between text-[11px] font-mono font-semibold text-marino/80 uppercase tracking-wider mb-1.5">
+                        <span>Payload de Metadatos Estructurados</span>
+                        <span class="px-1.5 py-0.5 rounded bg-pergamino-100 border border-pergamino-200 text-[10px] text-marino">
+                            APPLICATION/JSON
+                        </span>
+                    </label>
+                    <div class="font-mono text-xs">
+                        {{ form_version.metadatos }}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Barra de Ejecución / Commit al Ledger ── -->
+        <div class="bg-white border border-pergamino-300 rounded-xl px-6 py-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 font-mono text-[11px] text-marino/60">
+                <span class="h-2 w-2 rounded-full bg-marino"></span>
+                <span>Listo para generar bloque inmutable</span>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <a href="{% url 'dashboard' %}"
+                   class="bg-pergamino-200 hover:bg-pergamino-300 text-marino font-mono text-xs uppercase tracking-wider font-semibold px-4 py-2.5 rounded-lg transition border border-pergamino-300">
+                    Abortar
+                </a>
+
+                <button type="submit"
+                        class="bg-marino hover:bg-marino-light text-pergamino-100 font-mono text-xs uppercase tracking-wider font-semibold px-5 py-2.5 rounded-lg transition flex items-center gap-2 shadow-sm border border-marino"
+                        :class="{ 'opacity-75 cursor-not-allowed': cargando }"
+                        :disabled="cargando">
+                    <span x-show="!cargando" class="flex items-center gap-2">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Registrar y Sellar en Ledger</span>
+                    </span>
+                    <span x-show="cargando" class="flex items-center gap-2">
+                        <svg class="animate-spin h-4 w-4 text-pergamino-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Calculando Hash Chaining...</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

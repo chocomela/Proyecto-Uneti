@@ -1,0 +1,161 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Panel Principal | Crossover Ledger IA{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 px-4 space-y-6">
+    
+    <!-- ── Cabecera de Bienvenida y Estado del Ente ── -->
+    <div class="relative overflow-hidden bg-white border border-pergamino-300 border-l-4 border-l-marino rounded-xl p-6 shadow-sm">
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+             style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+        <div class="relative flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div class="space-y-1.5">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-widest bg-marino text-pergamino-100 shadow-inner">
+                        <span class="h-1.5 w-1.5 rounded-full bg-pergamino-100 animate-pulse"></span>
+                        NODO // {{ organizacion.siglas|default:"ENTE" }}
+                    </span>
+                    <span class="font-mono text-xs text-marino/60">
+                        RIF: {{ organizacion.rif }}
+                    </span>
+                </div>
+                <h1 class="text-2xl font-bold text-marino tracking-tight">{{ organizacion.nombre }}</h1>
+                <p class="text-xs text-marino/70 font-mono">
+                    [ GOVERNANCE & AI TRACEABILITY CONSOLE ] — Supervisión de artefactos y cadenas de bloques institucionales.
+                </p>
+            </div>
+            
+            <!-- Estado de Integridad Criptográfica del Ledger -->
+            <div class="flex items-center space-x-3.5 bg-pergamino-100/80 border border-pergamino-300 px-4 py-3 rounded-xl shadow-sm self-stretch md:self-auto justify-between md:justify-start">
+                {% if es_integra %}
+                    <span class="h-3.5 w-3.5 bg-emerald-500 rounded-full animate-pulse shadow-sm flex-shrink-0"></span>
+                    <div>
+                        <p class="font-mono text-xs font-bold text-emerald-900 uppercase tracking-wide">Ledger Íntegro</p>
+                        <p class="font-mono text-[10px] text-emerald-700">Cadena de hashes verificada OK</p>
+                    </div>
+                {% else %}
+                    <span class="h-3.5 w-3.5 bg-red-500 rounded-full shadow-sm flex-shrink-0"></span>
+                    <div>
+                        <p class="font-mono text-xs font-bold text-red-900 uppercase tracking-wide">Alerta de Integridad</p>
+                        <p class="font-mono text-[10px] text-red-700">{{ motivo_integridad }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de Secciones Principales -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Columna Izquierda/Central: Modelos de IA Registrados (2 columnas en lg) -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white border border-pergamino-300 rounded-xl shadow-sm overflow-hidden">
+                <header class="px-6 py-4 bg-pergamino-100/70 border-b border-pergamino-300 flex justify-between items-center">
+                    <div class="flex items-center gap-2.5">
+                        <span class="h-2 w-2 rounded-sm bg-marino"></span>
+                        <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-marino">
+                            Modelos de IA Registrados
+                        </h2>
+                    </div>
+                    <a href="{% url 'registrar_modelo' %}" class="bg-marino hover:bg-marino-light text-pergamino-100 font-mono text-[11px] uppercase tracking-wider font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow-sm">
+                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Registrar Modelo</span>
+                    </a>
+                </header>
+
+                <div class="divide-y divide-pergamino-200">
+                    {% if modelos %}
+                        {% for modelo in modelos %}
+                        <div class="p-6 hover:bg-pergamino-100/40 transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="space-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="font-bold text-marino text-base">{{ modelo.nombre }}</h3>
+                                    <span class="font-mono text-[10px] px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider border
+                                        {% if modelo.estado_actual == 'produccion' %}bg-emerald-50 text-emerald-800 border-emerald-200
+                                        {% elif modelo.estado_actual == 'validacion' %}bg-amber-50 text-amber-800 border-amber-200
+                                        {% elif modelo.estado_actual == 'desarrollo' %}bg-blue-50 text-blue-800 border-blue-200
+                                        {% else %}bg-pergamino-200 text-marino/80 border-pergamino-300{% endif %}">
+                                        {{ modelo.get_estado_actual_display }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-marino/70">
+                                    Framework / Proveedor: <span class="font-mono font-medium text-marino">{{ modelo.proveedor_framework|default:"No especificado" }}</span>
+                                </p>
+                                <p class="text-xs text-marino/60 line-clamp-1">
+                                    {{ modelo.proposito|default:modelo.descripcion }}
+                                </p>
+                            </div>
+
+                            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end flex-shrink-0">
+                                {% if modelo.version_actual %}
+                                <a href="{% url 'cambiar_estado' modelo.version_actual.id %}" class="bg-pergamino-100 hover:bg-pergamino-200 text-marino border border-pergamino-300 font-mono text-[11px] uppercase tracking-wider font-semibold px-3 py-2 rounded-lg transition">
+                                    Cambiar Estado
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-12 text-center space-y-3">
+                            <div class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-pergamino-100 text-marino/60 border border-pergamino-200">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                </svg>
+                            </div>
+                            <p class="font-mono text-xs text-marino/60">[ SIN REGISTROS ] — No hay modelos de IA indexados para este ente todavía.</p>
+                            <a href="{% url 'registrar_modelo' %}" class="inline-block font-mono text-xs text-marino font-bold uppercase tracking-wider underline hover:text-marino-light">
+                                Començar registro en ledger &rarr;
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Últimas Entradas del Ledger (Actividad Criptográfica) -->
+        {% if user.rol == 'administrador' %}
+        <div class="space-y-6">
+            <div class="bg-white border border-pergamino-300 rounded-xl shadow-sm overflow-hidden">
+                <header class="px-6 py-4 bg-pergamino-100/70 border-b border-pergamino-300 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-sm bg-marino"></span>
+                        <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-marino">Actividad del Ledger</h2>
+                    </div>
+                    <a href="{% url 'verificar_cadena' %}" class="font-mono text-xs text-marino font-semibold hover:underline flex items-center gap-1">
+                        Auditar &rarr;
+                    </a>
+                </header>
+
+                <div class="divide-y divide-pergamino-200 max-h-[500px] overflow-y-auto">
+                    {% if entradas_ledger %}
+                        {% for entrada in entradas_ledger %}
+                        <div class="p-4 hover:bg-pergamino-100/40 transition text-xs space-y-1.5 font-mono">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-marino">#{{ entrada.secuencia }} // {{ entrada.get_tipo_display }}</span>
+                                <span class="text-[10px] text-marino/50">{{ entrada.fecha_registro|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <div class="p-2 rounded bg-pergamino-100/70 border border-pergamino-200 text-[11px] text-marino/80 break-all" title="{{ entrada.hash_actual }}">
+                                <span class="text-marino/40">HASH:</span> {{ entrada.hash_actual|slice:":16" }}…
+                            </div>
+                            <p class="text-[11px] text-marino/60">
+                                <span class="text-marino/40">ACTOR:</span> @{{ entrada.actor.username }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-8 text-center font-mono text-xs text-marino/60">
+                            <p>[ VACÍO ] — Sin registros en el libro mayor.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Auditoría de Integridad | Crossover Ledger IA{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    
+    <div class="bg-white border border-pergamino-300 rounded-xl p-6 shadow-sm">
+        <div class="border-b border-pergamino-200 pb-4 mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <span class="text-xs uppercase font-bold tracking-wider text-marino/60">Módulo de Auditoría Externa (RF-03, RNF-01)</span>
+                <h1 class="text-xl font-bold text-marino mt-1">Verificación de Integridad del Ledger</h1>
+            </div>
+            
+            <a href="{% url 'dashboard' %}" class="bg-pergamino-200 hover:bg-pergamino-300 text-marino text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                &larr; Volver al Panel
+            </a>
+        </div>
+
+        <!-- Resultado de la Verificación -->
+        <div class="p-6 rounded-xl border mb-6 {% if es_valido %}bg-emerald-50 border-emerald-300 text-emerald-900{% else %}bg-red-50 border-red-300 text-red-900{% endif %}">
+            <div class="flex items-start space-x-3">
+                <div class="mt-0.5">
+                    {% if es_valido %}
+                        <svg class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    {% else %}
+                        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    {% endif %}
+                </div>
+                <div>
+                    <h2 class="text-base font-bold">
+                        {% if es_valido %}Cadena Criptográfica Íntegra{% else %}¡Alerta de Alteración en el Ledger!{% endif %}
+                    </h2>
+                    <p class="text-sm mt-1 opacity-90">{{ motivo }}</p>
+                    
+                    {% if not es_valido and entrada_erronea %}
+                    <div class="mt-3 p-3 bg-white/80 rounded border border-red-200 text-xs font-mono">
+                        <p class="font-bold text-red-900">Entrada con anomalía detectada:</p>
+                        <p>Secuencia: #{{ entrada_erronea.secuencia }} | ID: {{ entrada_erronea.id }}</p>
+                        <p>Hash Actual: {{ entrada_erronea.hash_actual }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <p class="text-xs text-marino/70">
+            La verificación recorre secuencialmente cada bloque registrado desde el bloque génesis hasta el actual, recalculando el hash SHA-256 canónico y validando el encadenamiento exacto con el campo <code class="bg-pergamino-200 px-1 py-0.5 rounded">hash_anterior</code>.
+        </p>
+    </div>
+</div>
+{% endblock %}

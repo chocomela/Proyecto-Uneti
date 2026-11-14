@@ -1,0 +1,253 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+  {% if es_admin %}Consola de Administración | Crossover Ledger IA
+  {% else %}Acceso Restringido | Crossover Ledger IA{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-8 px-4 space-y-6">
+
+  <!-- ── Banner Superior: Estado de Sesión / Nodo ── -->
+  <div class="relative overflow-hidden bg-white border border-pergamino-300 border-l-4 border-l-marino rounded-xl p-6 shadow-sm">
+    <!-- Patrón sutil de cuadrícula tecnológica en el fondo -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
+         style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 16px 16px;"></div>
+
+    <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-lg bg-marino text-pergamino-100 shadow-inner">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase tracking-widest bg-pergamino-200 text-marino border border-pergamino-300">
+              <span class="h-1.5 w-1.5 rounded-full bg-marino animate-pulse"></span>
+              {% if es_admin %}SYS.ADMIN // MODO GLOBAL{% else %}AUTH.PENDING // SIN NODO{% endif %}
+            </span>
+          </div>
+          <h1 class="text-lg font-bold text-marino tracking-tight mt-1.5">
+            {% if es_admin %}
+              Consola Central de Supervisión
+            {% else %}
+              Cuenta pendiente de asignación organizacional
+            {% endif %}
+          </h1>
+          <p class="text-xs text-marino/70 mt-0.5 max-w-2xl">
+            {% if es_admin %}
+              Visualización de telemetría global, auditoría de modelos de IA y control de identidades registradas en Crossover Ledger.
+            {% else %}
+              Tu credencial ha sido autenticada, pero aún no estás vinculado a una organización activa. Contacta a un administrador del sistema para habilitar tu entorno.
+            {% endif %}
+          </p>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'logout' %}" class="flex-shrink-0 self-end sm:self-center">
+        {% csrf_token %}
+        <button type="submit"
+                class="inline-flex items-center gap-2 bg-marino hover:bg-marino-light text-pergamino-100 text-xs font-mono uppercase tracking-wider font-semibold px-4 py-2.5 rounded-lg transition shadow-sm border border-marino">
+          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Desconectar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {% if es_admin %}
+
+  <!-- ── KPIs de Telemetría ── -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- KPI 1 -->
+    <div class="bg-white border border-pergamino-300 rounded-xl p-5 shadow-sm hover:border-marino/40 transition">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-mono uppercase tracking-widest text-marino/60">01 // Organizaciones</span>
+        <div class="p-1.5 rounded-md bg-pergamino-100 text-marino border border-pergamino-200">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-3 flex items-baseline justify-between">
+        <p class="text-3xl font-mono font-bold text-marino tabular-nums">{{ total_orgs }}</p>
+        <span class="text-[10px] font-mono text-marino/50 uppercase">Nodos activos</span>
+      </div>
+    </div>
+
+    <!-- KPI 2 -->
+    <div class="bg-white border border-pergamino-300 rounded-xl p-5 shadow-sm hover:border-marino/40 transition">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-mono uppercase tracking-widest text-marino/60">02 // Modelos de IA</span>
+        <div class="p-1.5 rounded-md bg-pergamino-100 text-marino border border-pergamino-200">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-3 flex items-baseline justify-between">
+        <p class="text-3xl font-mono font-bold text-marino tabular-nums">{{ modelos|length }}</p>
+        <span class="text-[10px] font-mono text-marino/50 uppercase">En inventario</span>
+      </div>
+    </div>
+
+    <!-- KPI 3 -->
+    <div class="bg-white border border-pergamino-300 rounded-xl p-5 shadow-sm hover:border-marino/40 transition">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] font-mono uppercase tracking-widest text-marino/60">03 // Operadores</span>
+        <div class="p-1.5 rounded-md bg-pergamino-100 text-marino border border-pergamino-200">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-3 flex items-baseline justify-between">
+        <p class="text-3xl font-mono font-bold text-marino tabular-nums">{{ usuarios|length }}</p>
+        <span class="text-[10px] font-mono text-marino/50 uppercase">Identidades</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Registro de Modelos IA ── -->
+  <section class="bg-white border border-pergamino-300 rounded-xl shadow-sm overflow-hidden">
+    <header class="px-6 py-3.5 bg-pergamino-100/70 border-b border-pergamino-300 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="h-2 w-2 rounded-sm bg-marino"></span>
+        <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-marino">
+          Registro de Modelos IA
+        </h2>
+      </div>
+      <span class="px-2.5 py-0.5 rounded bg-white border border-pergamino-300 font-mono text-[11px] font-medium text-marino">
+        TOTAL: {{ modelos|length }}
+      </span>
+    </header>
+
+    {% if modelos %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-pergamino-100 text-marino/70 font-mono text-[10px] uppercase tracking-wider border-b border-pergamino-200">
+            <tr>
+              <th class="text-left px-5 py-3">Identificador / Modelo</th>
+              <th class="text-left px-5 py-3">Organización</th>
+              <th class="text-left px-5 py-3">Estado</th>
+              <th class="text-left px-5 py-3">Build / Versión</th>
+              <th class="text-left px-5 py-3">Nivel de Riesgo</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-pergamino-200">
+            {% for m in modelos %}
+            <tr class="hover:bg-pergamino-100/60 transition-colors">
+              <td class="px-5 py-3 font-semibold text-marino">
+                {{ m.nombre }}
+              </td>
+              <td class="px-5 py-3">
+                <span class="font-mono text-xs px-2 py-0.5 rounded bg-pergamino-100 text-marino border border-pergamino-200">
+                  {{ m.organizacion.siglas|default:m.organizacion.nombre }}
+                </span>
+              </td>
+              <td class="px-5 py-3">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md font-mono text-[11px] font-medium bg-marino/10 text-marino border border-marino/20">
+                  <span class="h-1.5 w-1.5 rounded-full bg-marino"></span>
+                  {{ m.get_estado_actual_display }}
+                </span>
+              </td>
+              <td class="px-5 py-3 font-mono text-xs text-marino/80">
+                {% if m.version_actual %}
+                  <span class="px-1.5 py-0.5 rounded bg-pergamino-200/70 text-marino font-semibold">v{{ m.version_actual.version }}</span>
+                {% else %}
+                  <span class="text-marino/40">N/A</span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-3 font-mono text-xs text-marino/80">
+                {{ m.get_nivel_riesgo_display }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-8 text-center font-mono text-xs text-marino/60">
+        [ SIN REGISTROS ] — Aún no hay modelos de IA indexados en el sistema.
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- ── Directorio de Usuarios ── -->
+  <section class="bg-white border border-pergamino-300 rounded-xl shadow-sm overflow-hidden">
+    <header class="px-6 py-3.5 bg-pergamino-100/70 border-b border-pergamino-300 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="h-2 w-2 rounded-sm bg-marino"></span>
+        <h2 class="text-xs font-mono font-bold uppercase tracking-widest text-marino">
+          Directorio de Identidades
+        </h2>
+      </div>
+      <span class="px-2.5 py-0.5 rounded bg-white border border-pergamino-300 font-mono text-[11px] font-medium text-marino">
+        TOTAL: {{ usuarios|length }}
+      </span>
+    </header>
+
+    {% if usuarios %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-pergamino-100 text-marino/70 font-mono text-[10px] uppercase tracking-wider border-b border-pergamino-200">
+            <tr>
+              <th class="text-left px-5 py-3">Usuario</th>
+              <th class="text-left px-5 py-3">Nombre Completo</th>
+              <th class="text-left px-5 py-3">Correo Electrónico</th>
+              <th class="text-left px-5 py-3">Nodo / Org</th>
+              <th class="text-left px-5 py-3">Privilegios</th>
+              <th class="text-left px-5 py-3">Alta</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-pergamino-200">
+            {% for u in usuarios %}
+            <tr class="hover:bg-pergamino-100/60 transition-colors">
+              <td class="px-5 py-3 font-mono text-xs font-bold text-marino">
+                @{{ u.username }}
+              </td>
+              <td class="px-5 py-3 text-marino/80">
+                {{ u.get_full_name|default:"—" }}
+              </td>
+              <td class="px-5 py-3 font-mono text-xs text-marino/70">
+                {{ u.email|default:"—" }}
+              </td>
+              <td class="px-5 py-3">
+                {% if u.organizacion %}
+                  <span class="font-mono text-xs px-2 py-0.5 rounded bg-pergamino-100 text-marino border border-pergamino-200">
+                    {{ u.organizacion.siglas|default:u.organizacion.nombre }}
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md font-mono text-[11px] font-medium bg-pink-100 text-pink-700 border border-pink-200">
+                    <span class="h-1.5 w-1.5 rounded-full bg-pink-600"></span>
+                    SIN ASIGNAR
+                  </span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-3 font-mono text-xs text-marino/80">
+                {{ u.get_rol_display }}
+              </td>
+              <td class="px-5 py-3 font-mono text-xs text-marino/60 tabular-nums">
+                {{ u.date_joined|date:"Y-m-d" }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-8 text-center font-mono text-xs text-marino/60">
+        [ SIN REGISTROS ] — No hay usuarios registrados todavía.
+      </div>
+    {% endif %}
+  </section>
+
+  {% endif %}
+
+</div>
+{% endblock %}
